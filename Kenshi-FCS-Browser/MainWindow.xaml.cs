@@ -25,7 +25,48 @@ namespace Kenshi_FCS_Browser
 
         private static readonly ItemType[] BLACKLISTED_TYPES = new ItemType[]
         {
-            ItemType.DIALOGUE_LINE
+            ItemType.DIALOGUE_LINE,
+            ItemType.DIALOGUE,
+            // the following have no GameDataItems in the base files
+            ItemType.LOCATION,
+            ItemType.WAR_SAVESTATE,
+            ItemType.NULL_ITEM,
+            ItemType.ZONE_MAP,
+            ItemType.WORLDMAP_CHARACTER,
+            ItemType.CHARACTER_APPEARANCE_OLD,
+            ItemType.TECHTREE,
+            ItemType.AI_STATE,
+            ItemType.INSTANCE_COLLECTION,
+            ItemType.TEMPORARY_INFO,
+            ItemType.MOD_FILENAME,
+            ItemType.PLATOON,
+            ItemType.GAMESTATE_BUILDING,
+            ItemType.GAMESTATE_CHARACTER,
+            ItemType.GAMESTATE_FACTION,
+            ItemType.GAMESTATE_TOWN_INSTANCE_LIST,
+            ItemType.STATE,
+            ItemType.SAVED_STATE,
+            ItemType.INVENTORY_STATE,
+            ItemType.INVENTORY_ITEM_STATE,
+            ItemType.GAMESTATE_BUILDING_INTERIOR,
+            ItemType.LOCATION_NODE,
+            ItemType.MEDICAL_STATE,
+            ItemType.MEDICAL_PART_STATE,
+            ItemType.GAMESTATE_CRAFTING,
+            ItemType.CHARACTER_APPEARANCE,
+            ItemType.GAMESTATE_AI,
+            ItemType.HUMAN_CHARACTER,
+            ItemType.AI_SCHEDULE,
+            ItemType.NEST,
+            ItemType.BLUEPRINT,
+            ItemType.SHOP_TRADER_CLASS,
+            ItemType.GAMESTATE_TOWN,
+            ItemType.TUTORIAL,
+            ItemType.TERRAIN_DECALS,
+            ItemType.BOAT,
+            ItemType.GAMESTATE_BOAT,
+            ItemType.BUILD_GRID,
+            ItemType.OBJECT_TYPE_MAX
         };
 
         public MainWindow()
@@ -43,10 +84,8 @@ namespace Kenshi_FCS_Browser
             GameData data = null;
             foreach (var fileName in filesToLoad)
             {
-                using (var dataReader = new GameDataReader(Path.Combine(DataDirectory, fileName)))
-                {
-                    data = dataReader.Load(data);
-                }
+                using var dataReader = new GameDataReader(Path.Combine(DataDirectory, fileName));
+                data = dataReader.Load(data);
             }
 
             var itemType = typeof(ItemType);
@@ -63,14 +102,16 @@ namespace Kenshi_FCS_Browser
                     Header = type.ToString()
                 };
 
-                foreach (var gameDataItem in data.GetItemsOfType(type))
-                {
+                var gameDataItems = data.GetItemsOfType(type);
+
+                foreach (var gameDataItem in gameDataItems)
+                { 
                     var subItem = new TreeViewItem()
                     {
                         Header = $"{gameDataItem.Name} ({gameDataItem.RefCount})"
                     };
 
-                    foreach (var referenceTypePair in gameDataItem.references)
+                    foreach (var referenceTypePair in gameDataItem.References)
                     {
                         var key = referenceTypePair.Key;
                         var references = referenceTypePair.Value;

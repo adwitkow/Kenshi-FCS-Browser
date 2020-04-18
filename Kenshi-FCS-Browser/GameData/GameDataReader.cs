@@ -240,23 +240,23 @@ namespace Kenshi_FCS_Browser
 						string str11 = ReadString();
 						TripleInt tripleInt = new TripleInt(0, 0, 0)
 						{
-							v0 = reader.ReadInt32()
+							x = reader.ReadInt32()
 						};
 						if (fileVersion >= 10)
 						{
-							tripleInt.v1 = reader.ReadInt32();
-							tripleInt.v2 = reader.ReadInt32();
+							tripleInt.y = reader.ReadInt32();
+							tripleInt.z = reader.ReadInt32();
 						}
 						if (strs1 == null || strs1.ContainsKey(string.Concat("-ref-", str11)))
 						{
-							bool flag2 = (strs1 == null || strs1[string.Concat("-ref-", str11)] ? tripleInt.v2 == 2147483647 : true);
+							bool flag2 = (strs1 == null || strs1[string.Concat("-ref-", str11)] ? tripleInt.z == 2147483647 : true);
 							Reference reference = item.GetReference(str10, str11);
 							if (!flag2 || reference != null)
 							{
 								if (reference == null)
 								{
 									reference = new Reference(str11, null);
-									item.references[str10].Add(reference);
+									item.References[str10].Add(reference);
 								}
 								else if (flag2)
 								{
@@ -270,13 +270,13 @@ namespace Kenshi_FCS_Browser
 										{
 											reference.item.RemoveRef(item);
 										}
-										item.references[str10].Remove(reference);
+										item.References[str10].Remove(reference);
 									}
 									tripleInt = Reference.Removed;
 								}
-								if (mode == ModMode.ACTIVE && item.ItemType == ItemType.DIALOGUE_PACKAGE && tripleInt.v1 == 100)
+								if (mode == ModMode.ACTIVE && item.ItemType == ItemType.DIALOGUE_PACKAGE && tripleInt.y == 100)
 								{
-									tripleInt.v1 = 0;
+									tripleInt.y = 0;
 								}
 								if (mode == ModMode.BASE)
 								{
@@ -354,24 +354,24 @@ namespace Kenshi_FCS_Browser
 				{
 					instance.Flatten();
 				}
-				if (!item.instances.ContainsKey(str12))
+				if (!item.Instances.ContainsKey(str12))
 				{
-					item.instances.Add(str12, instance);
+					item.Instances.Add(str12, instance);
 				}
-				if (string.IsNullOrEmpty((string)instance.data["ref"]))
+				if (string.IsNullOrEmpty((string)instance.Data["ref"]))
 				{
-					item.instances[str12].Flatten();
+					item.Instances[str12].Flatten();
 				}
 			}
 			if (item.ContainsKey("REMOVED"))
 			{
-				if ((bool)item.data["REMOVED"])
+				if ((bool)item.Data["REMOVED"])
 				{
 					item.cachedState = GameDataState.REMOVED;
 				}
 				strs.Remove("REMOVED");
-				item.modData.Remove("REMOVED");
-				item.lockedData.Remove("REMOVED");
+				item.ModData.Remove("REMOVED");
+				item.LockedData.Remove("REMOVED");
 				item.RemoveRefTargets();
 			}
 			else if (mode == ModMode.BASE)
@@ -384,15 +384,15 @@ namespace Kenshi_FCS_Browser
 			}
 			if (mode == ModMode.ACTIVE && item.baseName != null)
 			{
-				foreach (KeyValuePair<string, object> datum in item.data)
+				foreach (KeyValuePair<string, object> datum in item.Data)
 				{
-					if (!item.modData.ContainsKey(datum.Key) || !item.modData[datum.Key].Equals(datum.Value))
+					if (!item.ModData.ContainsKey(datum.Key) || !item.ModData[datum.Key].Equals(datum.Value))
 					{
 						continue;
 					}
-					item.modData.Remove(datum.Key);
+					item.ModData.Remove(datum.Key);
 				}
-				foreach (KeyValuePair<string, List<Reference>> keyValuePair in item.references)
+				foreach (KeyValuePair<string, List<Reference>> keyValuePair in item.References)
 				{
 					foreach (Reference value in keyValuePair.Value)
 					{

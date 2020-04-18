@@ -9,52 +9,42 @@ namespace Kenshi_FCS_Browser
     public class GameDataItem
     {
 		public int id;
-
 		public GameDataState cachedState;
-
 		public string baseName;
-
 		public string modName;
-
 		public string lockedName;
-
 		public string mod;
 
-		public SortedList<string, object> data = new SortedList<string, object>();
-
-		public SortedList<string, object> modData = new SortedList<string, object>();
-
-		public SortedList<string, object> lockedData = new SortedList<string, object>();
-
-		public SortedList<string, List<Reference>> references = new SortedList<string, List<Reference>>();
-
-		public SortedList<string, ArrayList> removed = new SortedList<string, ArrayList>();
-
-		public SortedList<string, GameDataInstance> instances = new SortedList<string, GameDataInstance>();
+		public SortedList<string, object> Data { get; private set; } = new SortedList<string, object>();
+		public SortedList<string, object> ModData { get; private set; } = new SortedList<string, object>();
+		public SortedList<string, object> LockedData { get; private set; } = new SortedList<string, object>();
+		public SortedList<string, List<Reference>> References { get; private set; } = new SortedList<string, List<Reference>>();
+		public SortedList<string, ArrayList> Removed { get; private set; } = new SortedList<string, ArrayList>();
+		public SortedList<string, GameDataInstance> Instances { get; private set; } = new SortedList<string, GameDataInstance>();
 
 		public object this[string s]
 		{
 			get
 			{
-				if (this.lockedData.ContainsKey(s))
+				if (this.LockedData.ContainsKey(s))
 				{
-					return this.lockedData[s];
+					return this.LockedData[s];
 				}
-				if (!this.modData.ContainsKey(s))
+				if (!this.ModData.ContainsKey(s))
 				{
-					return this.data[s];
+					return this.Data[s];
 				}
-				return this.modData[s];
+				return this.ModData[s];
 			}
 			set
 			{
-				if (!this.data.ContainsKey(s) || !value.Equals(this.data[s]))
+				if (!this.Data.ContainsKey(s) || !value.Equals(this.Data[s]))
 				{
-					this.modData[s] = value;
+					this.ModData[s] = value;
 				}
-				else if (this.modData.ContainsKey(s))
+				else if (this.ModData.ContainsKey(s))
 				{
-					this.modData.Remove(s);
+					this.ModData.Remove(s);
 				}
 				this.RefreshState();
 			}
@@ -90,7 +80,7 @@ namespace Kenshi_FCS_Browser
 				this.RefreshState();
 			}
 		}
-		public int RefCount { get => references.Sum(pair => pair.Value.Count); }
+		public int RefCount { get => References.Sum(pair => pair.Value.Count); }
 
 		public GameDataItem(ItemType itemType, string itemId)
         {
@@ -102,15 +92,15 @@ namespace Kenshi_FCS_Browser
 		{
 			if (mode == ModMode.BASE)
 			{
-				return data;
+				return Data;
 			}
 			else if (mode == ModMode.ACTIVE)
 			{
-				return modData;
+				return ModData;
 			}
 			else if (mode == ModMode.LOCKED)
 			{
-				return lockedData;
+				return LockedData;
 			}
 			else
 			{
@@ -135,12 +125,12 @@ namespace Kenshi_FCS_Browser
 		{
 			this.baseName = this.Name;
 			this.modName = null;
-			foreach (KeyValuePair<string, object> modDatum in this.modData)
+			foreach (KeyValuePair<string, object> modDatum in this.ModData)
 			{
-				this.data[modDatum.Key] = modDatum.Value;
+				this.Data[modDatum.Key] = modDatum.Value;
 			}
-			this.modData.Clear();
-			foreach (KeyValuePair<string, List<Reference>> reference in this.references)
+			this.ModData.Clear();
+			foreach (KeyValuePair<string, List<Reference>> reference in this.References)
 			{
 				foreach (Reference value in reference.Value)
 				{
@@ -152,9 +142,9 @@ namespace Kenshi_FCS_Browser
 					value.mod = null;
 				}
 			}
-			this.removed.Clear();
+			this.Removed.Clear();
 			List<string> strs = new List<string>();
-			foreach (KeyValuePair<string, GameDataInstance> instance in this.instances)
+			foreach (KeyValuePair<string, GameDataInstance> instance in this.Instances)
 			{
 				if (instance.Value.cachedState != GameDataState.REMOVED)
 				{
@@ -167,7 +157,7 @@ namespace Kenshi_FCS_Browser
 			}
 			foreach (string str in strs)
 			{
-				this.instances.Remove(str);
+				this.Instances.Remove(str);
 			}
 		}
 
@@ -175,7 +165,7 @@ namespace Kenshi_FCS_Browser
 		{
 			foreach (string str in this.ReferenceLists())
 			{
-				foreach (Reference item in this.references[str])
+				foreach (Reference item in this.References[str])
 				{
 					if (item.item != null)
 					{
@@ -184,7 +174,7 @@ namespace Kenshi_FCS_Browser
 					item.item = null;
 				}
 			}
-			foreach (GameDataInstance value in this.instances.Values)
+			foreach (GameDataInstance value in this.Instances.Values)
 			{
 				if (value.resolvedRef != null)
 				{
@@ -215,30 +205,30 @@ namespace Kenshi_FCS_Browser
 
 		public bool ContainsKey(string key)
 		{
-			if (this.modData.ContainsKey(key) || this.data.ContainsKey(key))
+			if (this.ModData.ContainsKey(key) || this.Data.ContainsKey(key))
 			{
 				return true;
 			}
-			return this.lockedData.ContainsKey(key);
+			return this.LockedData.ContainsKey(key);
 		}
 
 		public void Remove(string key)
 		{
-			this.modData.Remove(key);
+			this.ModData.Remove(key);
 			if (this.baseName == null)
 			{
-				this.data.Remove(key);
+				this.Data.Remove(key);
 			}
 		}
 
 		public Reference GetReference(string section, string id)
 		{
 			Reference reference;
-			if (!this.references.ContainsKey(section))
+			if (!this.References.ContainsKey(section))
 			{
-				this.references.Add(section, new List<Reference>());
+				this.References.Add(section, new List<Reference>());
 			}
-			IEnumerator enumerator = this.references[section].GetEnumerator();
+			IEnumerator enumerator = this.References[section].GetEnumerator();
 			try
 			{
 				while (enumerator.MoveNext())
@@ -274,21 +264,21 @@ namespace Kenshi_FCS_Browser
 				}
 				else
 				{
-					this.removed[section].Remove(reference);
+					this.Removed[section].Remove(reference);
 				}
-				this.references[section].Add(reference);
+				this.References[section].Add(reference);
 
 				if (v0.HasValue)
 				{
-					reference.mod.v0 = v0.Value;
+					reference.mod.x = v0.Value;
 				}
 				if (v1.HasValue)
 				{
-					reference.mod.v1 = v1.Value;
+					reference.mod.y = v1.Value;
 				}
 				if (v2.HasValue)
 				{
-					reference.mod.v2 = v2.Value;
+					reference.mod.z = v2.Value;
 				}
 				if (reference.original != null && reference.original.Equals(reference.mod))
 				{
@@ -302,9 +292,9 @@ namespace Kenshi_FCS_Browser
 		private Reference GetRemovedReference(string section, string id)
 		{
 			Reference reference;
-			if (this.removed.ContainsKey(section))
+			if (this.Removed.ContainsKey(section))
 			{
-				IEnumerator enumerator = this.removed[section].GetEnumerator();
+				IEnumerator enumerator = this.Removed[section].GetEnumerator();
 				try
 				{
 					while (enumerator.MoveNext())
@@ -332,7 +322,7 @@ namespace Kenshi_FCS_Browser
 
 		public IEnumerable<string> ReferenceLists()
 		{
-			foreach (KeyValuePair<string, List<Reference>> reference in this.references)
+			foreach (KeyValuePair<string, List<Reference>> reference in this.References)
 			{
 				yield return reference.Key;
 			}
@@ -340,11 +330,11 @@ namespace Kenshi_FCS_Browser
 
 		public GameDataInstance GetInstance(string id)
 		{
-			if (!this.instances.ContainsKey(id))
+			if (!this.Instances.ContainsKey(id))
 			{
 				return null;
 			}
-			return this.instances[id];
+			return this.Instances[id];
 		}
 
 		public void RemoveRef(GameDataItem from)
@@ -352,7 +342,7 @@ namespace Kenshi_FCS_Browser
 			bool flag = false;
 			foreach (string str in from.ReferenceLists())
 			{
-				foreach (object item in from.references[str])
+				foreach (object item in from.References[str])
 				{
 					if (((Reference)item).item != this)
 					{
@@ -368,7 +358,7 @@ namespace Kenshi_FCS_Browser
 					}
 				}
 			}
-			foreach (GameDataInstance value in from.instances.Values)
+			foreach (GameDataInstance value in from.Instances.Values)
 			{
 				if (value.resolvedRef == this)
 				{
@@ -417,13 +407,13 @@ namespace Kenshi_FCS_Browser
 			{
 				r.item = null;
 				r.mod = Reference.Removed;
-				if (!this.removed.ContainsKey(section))
+				if (!this.Removed.ContainsKey(section))
 				{
-					this.removed.Add(section, new ArrayList());
+					this.Removed.Add(section, new ArrayList());
 				}
-				this.removed[section].Add(r);
+				this.Removed[section].Add(r);
 			}
-			this.references[section].Remove(r);
+			this.References[section].Remove(r);
 			this.RefreshState();
 		}
 

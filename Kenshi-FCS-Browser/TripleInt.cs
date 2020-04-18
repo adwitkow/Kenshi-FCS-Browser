@@ -6,33 +6,33 @@ namespace Kenshi_FCS_Browser
 {
 	public class TripleInt
 	{
-		public int v0;
+		public int x;
 
-		public int v1;
+		public int y;
 
-		public int v2;
+		public int z;
 
-		public TripleInt(TripleInt v)
+		public TripleInt(TripleInt value)
 		{
-			this.v0 = v.v0;
-			this.v1 = v.v1;
-			this.v2 = v.v2;
+			this.x = value.x;
+			this.y = value.y;
+			this.z = value.z;
 		}
 
-		public TripleInt(int i0 = 0, int i1 = 0, int i2 = 0)
+		public TripleInt(int x = 0, int y = 0, int z = 0)
 		{
-			this.v0 = i0;
-			this.v1 = i1;
-			this.v2 = i2;
+			this.x = x;
+			this.y = y;
+			this.z = z;
 		}
 
 		public bool Equals(TripleInt b)
 		{
-			if (b == null || this.v0 != b.v0 || this.v1 != b.v1)
+			if (b == null || this.x != b.x || this.y != b.y)
 			{
 				return false;
 			}
-			return this.v2 == b.v2;
+			return this.z == b.z;
 		}
 
 		public override bool Equals(object obj)
@@ -45,9 +45,14 @@ namespace Kenshi_FCS_Browser
 			return Equals((TripleInt)obj);
 		}
 
+		public override int GetHashCode()
+		{
+			return HashCode.Combine(this.x, this.y, this.z);
+		}
+
 		public override string ToString()
 		{
-			return $"({v0}, {v1}, {v2})";
+			return $"({x}, {y}, {z})";
 		}
 	}
 }
