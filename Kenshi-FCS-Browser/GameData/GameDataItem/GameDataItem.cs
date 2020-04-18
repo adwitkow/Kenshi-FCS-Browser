@@ -252,7 +252,7 @@ namespace Kenshi_FCS_Browser
 			}
 		}
 
-		public Reference AddReference(string section, string id, int? v0 = null, int? v1 = null, int? v2 = null)
+		public Reference AddReference(string section, string id, int? x = null, int? y = null, int? z = null)
 		{
 			Reference reference = this.GetReference(section, id);
 			if (reference == null)
@@ -268,17 +268,17 @@ namespace Kenshi_FCS_Browser
 				}
 				this.References[section].Add(reference);
 
-				if (v0.HasValue)
+				if (x.HasValue)
 				{
-					reference.mod.x = v0.Value;
+					reference.mod.x = x.Value;
 				}
-				if (v1.HasValue)
+				if (y.HasValue)
 				{
-					reference.mod.y = v1.Value;
+					reference.mod.y = y.Value;
 				}
-				if (v2.HasValue)
+				if (z.HasValue)
 				{
-					reference.mod.z = v2.Value;
+					reference.mod.z = z.Value;
 				}
 				if (reference.original != null && reference.original.Equals(reference.mod))
 				{

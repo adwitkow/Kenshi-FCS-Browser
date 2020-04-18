@@ -109,7 +109,6 @@ namespace Kenshi_FCS_Browser
 		{
 			int num;
 			int num1;
-			int? nullable;
 			string str;
 
 			item.baseName = name;
@@ -222,7 +221,7 @@ namespace Kenshi_FCS_Browser
 			for (int p = 0; p < num; p++)
 			{
 				string str8 = ReadString();
-				string str9 = ReadString();
+				ReadString();
 				if (item.IsTagged(strs1, str8))
 				{
 					// GameDataFile
@@ -328,12 +327,7 @@ namespace Kenshi_FCS_Browser
 					{
 						for (int t = 0; t < num4; t++)
 						{
-							nullable = null;
-							int? nullable1 = nullable;
-							nullable = null;
-							int? nullable2 = nullable;
-							nullable = null;
-							instance.AddReference("states", ReadString(), nullable1, nullable2, nullable);
+							instance.AddReference("states", ReadString());
 						}
 					}
 					else
@@ -341,12 +335,7 @@ namespace Kenshi_FCS_Browser
 						for (int u = 0; u < num4; u++)
 						{
 							num1 = reader.ReadInt32();
-							nullable = null;
-							int? nullable3 = nullable;
-							nullable = null;
-							int? nullable4 = nullable;
-							nullable = null;
-							instance.AddReference("states", string.Concat(num1.ToString(), "-", filename, "-INGAME"), nullable3, nullable4, nullable);
+							instance.AddReference("states", string.Concat(num1.ToString(), "-", filename, "-INGAME"));
 						}
 					}
 				}
