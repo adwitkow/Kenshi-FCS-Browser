@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Kenshi_FCS_Browser
@@ -25,7 +26,7 @@ namespace Kenshi_FCS_Browser
 
 		public SortedList<string, object> lockedData = new SortedList<string, object>();
 
-		public SortedList<string, ArrayList> references = new SortedList<string, ArrayList>();
+		public SortedList<string, List<Reference>> references = new SortedList<string, List<Reference>>();
 
 		public SortedList<string, ArrayList> removed = new SortedList<string, ArrayList>();
 
@@ -98,14 +99,13 @@ namespace Kenshi_FCS_Browser
 				this.RefreshState();
 			}
 		}
-		public int RefCount { get; private set; }
+		public int RefCount { get => references.Sum(pair => pair.Value.Count); }
 
 		public GameDataItem(ItemType itemType, string itemId)
         {
             this.ItemType = itemType;
             this.StringId = itemId;
 			this.SetupAccessors();
-			this.RefCount = 0;
 		}
 
 		public SortedList<string, object> GetListForModMode(ModMode mode)
@@ -150,7 +150,7 @@ namespace Kenshi_FCS_Browser
 				this.data[modDatum.Key] = modDatum.Value;
 			}
 			this.modData.Clear();
-			foreach (KeyValuePair<string, ArrayList> reference in this.references)
+			foreach (KeyValuePair<string, List<Reference>> reference in this.references)
 			{
 				foreach (Reference value in reference.Value)
 				{
@@ -246,7 +246,7 @@ namespace Kenshi_FCS_Browser
 			Reference reference;
 			if (!this.references.ContainsKey(section))
 			{
-				this.references.Add(section, new ArrayList());
+				this.references.Add(section, new List<Reference>());
 			}
 			IEnumerator enumerator = this.references[section].GetEnumerator();
 			try
@@ -342,7 +342,7 @@ namespace Kenshi_FCS_Browser
 
 		public IEnumerable<string> ReferenceLists()
 		{
-			foreach (KeyValuePair<string, ArrayList> reference in this.references)
+			foreach (KeyValuePair<string, List<Reference>> reference in this.references)
 			{
 				yield return reference.Key;
 			}
@@ -411,7 +411,6 @@ namespace Kenshi_FCS_Browser
 					}
 				}
 			}
-			this.RefCount -= 1;
 		}
 
 		private void RemoveReference(string section, Reference r)

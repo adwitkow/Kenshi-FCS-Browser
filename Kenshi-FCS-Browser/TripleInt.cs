@@ -34,5 +34,20 @@ namespace Kenshi_FCS_Browser
 			}
 			return this.v2 == b.v2;
 		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj == null)
+			{
+				throw new ArgumentNullException(nameof(obj));
+			}
+
+			return Equals((TripleInt)obj);
+		}
+
+		public override string ToString()
+		{
+			return $"({v0}, {v1}, {v2})";
+		}
 	}
 }

@@ -392,7 +392,7 @@ namespace Kenshi_FCS_Browser
 					}
 					item.modData.Remove(datum.Key);
 				}
-				foreach (KeyValuePair<string, ArrayList> keyValuePair in item.references)
+				foreach (KeyValuePair<string, List<Reference>> keyValuePair in item.references)
 				{
 					foreach (Reference value in keyValuePair.Value)
 					{
