@@ -22,7 +22,11 @@ namespace Kenshi_FCS_Browser
     public partial class MainWindow : Window
     {
         private static readonly string DataDirectory = "D:\\Steam\\steamapps\\common\\Kenshi\\data\\";
-        private Dictionary<string, string> lines;
+
+        private static readonly ItemType[] BLACKLISTED_TYPES = new ItemType[]
+        {
+            ItemType.DIALOGUE_LINE
+        };
 
         public MainWindow()
         {
@@ -31,7 +35,6 @@ namespace Kenshi_FCS_Browser
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            lines = new Dictionary<string, string>();
             string[] filesToLoad = { "gamedata.base", "Newwworld.mod", "Dialogue.mod", "rebirth.mod" };
             // TODO: SELECT KENSHI DIRECTORY dialog
             // TODO: Cleanup
@@ -48,25 +51,20 @@ namespace Kenshi_FCS_Browser
 
             var itemType = typeof(ItemType);
 
-            foreach (var type in Enum.GetValues(itemType))
+            foreach (ItemType type in Enum.GetValues(itemType))
             {
+                if (BLACKLISTED_TYPES.Contains(type))
+                {
+                    continue;
+                }
+
                 var item = new TreeViewItem()
                 {
-                    Header = Enum.GetName(itemType, type)
+                    Header = type.ToString()
                 };
 
-                foreach (var gameDataItem in data.GetItemsOfType((ItemType)type))
+                foreach (var gameDataItem in data.GetItemsOfType(type))
                 {
-                    if (gameDataItem.ItemType == ItemType.DIALOGUE)
-                    {
-                        if (gameDataItem.Name == "armour king talk to")
-                        {
-                            Console.WriteLine("sztop");
-                        }
-
-                        PullDialogueLines(gameDataItem.Name, gameDataItem, ref data);
-                    }
-
                     var subItem = new TreeViewItem()
                     {
                         Header = $"{gameDataItem.Name} ({gameDataItem.RefCount})"
@@ -101,49 +99,6 @@ namespace Kenshi_FCS_Browser
                 }
 
                 DataTreeView.Items.Add(item);
-            }
-        }
-
-        private void PullDialogueLines(string rootName, GameDataItem item, ref GameData data)
-        {
-            var references = item.references;
-            if (references.Count == 0 || !references.ContainsKey("lines"))
-            {
-                return;
-            }
-
-            foreach (var lineItemReference in references["lines"])
-            {
-                var lineItem = data.GetItem(lineItemReference.itemID);
-
-                var values = new List<string>();
-                foreach (var pair in lineItem.data)
-                {
-                    if (!pair.Key.StartsWith("text"))
-                    {
-                        continue;
-                    }
-
-                    var value = pair.Value as string;
-
-                    if (string.IsNullOrWhiteSpace(value))
-                    {
-                        continue;
-                    }
-
-                    if (value.Contains("crafting"))
-                    {
-                        Console.WriteLine("sztop");
-                    }
-
-                    values.Add(value);
-                }
-
-                if (!lines.ContainsKey(lineItem.StringId))
-                {
-                    lines.Add(lineItem.StringId, $"{rootName}:{string.Join("|", values)}");
-                    PullDialogueLines(rootName, lineItem, ref data);
-                }
             }
         }
     }

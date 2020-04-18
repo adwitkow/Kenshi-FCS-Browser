@@ -32,15 +32,6 @@ namespace Kenshi_FCS_Browser
 
 		public SortedList<string, GameDataInstance> instances = new SortedList<string, GameDataInstance>();
 
-
-		public GameDataItem.Accessor<int> idata;
-
-		public GameDataItem.Accessor<bool> bdata;
-
-		public GameDataItem.Accessor<float> fdata;
-
-		public GameDataItem.Accessor<string> sdata;
-
 		public object this[string s]
 		{
 			get
@@ -105,7 +96,6 @@ namespace Kenshi_FCS_Browser
         {
             this.ItemType = itemType;
             this.StringId = itemId;
-			this.SetupAccessors();
 		}
 
 		public SortedList<string, object> GetListForModMode(ModMode mode)
@@ -440,53 +430,6 @@ namespace Kenshi_FCS_Browser
 		public void RemoveReference(string section, string id)
 		{
 			this.RemoveReference(section, this.GetReference(section, id));
-		}
-
-		private void SetupAccessors()
-		{
-			this.idata = new Accessor<int>(this);
-			this.fdata = new Accessor<float>(this);
-			this.bdata = new Accessor<bool>(this);
-			this.sdata = new Accessor<string>(this);
-		}
-
-		public class Accessor<T>
-		{
-			private readonly GameDataItem item;
-
-			public T this[string s]
-			{
-				get
-				{
-					return (T)this.item[s];
-				}
-				set
-				{
-					this.item[s] = value;
-				}
-			}
-
-			public Accessor(GameDataItem me)
-			{
-				this.item = me;
-			}
-
-			public bool ContainsKey(string key)
-			{
-				if (!this.item.ContainsKey(key))
-				{
-					return false;
-				}
-				return this.item[key] is T;
-			}
-
-			public void Remove(string key)
-			{
-				if (this.ContainsKey(key))
-				{
-					this.item.Remove(key);
-				}
-			}
 		}
 	}
 }

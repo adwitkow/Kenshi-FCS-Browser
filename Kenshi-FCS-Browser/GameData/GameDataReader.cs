@@ -358,14 +358,14 @@ namespace Kenshi_FCS_Browser
 				{
 					item.instances.Add(str12, instance);
 				}
-				if (string.IsNullOrEmpty(instance.sdata["ref"]))
+				if (string.IsNullOrEmpty((string)instance.data["ref"]))
 				{
 					item.instances[str12].Flatten();
 				}
 			}
 			if (item.ContainsKey("REMOVED"))
 			{
-				if (item.bdata["REMOVED"])
+				if ((bool)item.data["REMOVED"])
 				{
 					item.cachedState = GameDataState.REMOVED;
 				}
