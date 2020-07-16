@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Kenshi_FCS_Browser
 {
-	class GameDataReader : IDisposable
+	public class GameDataReader : IDisposable
 	{
 		private byte[] stringByteBuffer = new byte[4096];
 		private readonly BinaryReader reader;

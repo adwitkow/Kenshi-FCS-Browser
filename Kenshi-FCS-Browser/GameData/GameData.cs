@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Kenshi_FCS_Browser
 {
-    class GameData
+    public class GameData
     {
 		public readonly Dictionary<string, GameDataItem> items;
 
